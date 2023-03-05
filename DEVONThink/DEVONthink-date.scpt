@@ -112,68 +112,6 @@ on get_date_input()
 end get_date_input
 
 (*
-on ui_date_input()
-
-	set theApp to path to frontmost application as text
-
-	if not (current application's NSThread's isMainThread()) as boolean then
-		display alert "This script must be run from the main thread." buttons {"Cancel"} as critical
-		error number -128
-	end if
-	-- create a view
-	set theView to current application's NSView's alloc()'s initWithFrame:(current application's NSMakeRect(0, 0, 100, 200))
-	-- create date picker
-	set datePicker to current application's NSDatePicker's alloc()'s initWithFrame:(current application's NSMakeRect(0, 0, 100, 100))
-	-- set style: choices are NSTextFieldAndStepperDatePickerStyle, NSClockAndCalendarDatePickerStyle, or NSTextFieldDatePickerStyle
-	datePicker's setDatePickerStyle:(current application's NSClockAndCalendarDatePickerStyle)
-	-- set elements: choices include NSHourMinuteDatePickerElementFlag, NSHourMinuteSecondDatePickerElementFlag, NSTimeZoneDatePickerElementFlag, NSYearMonthDatePickerElementFlag, and NSEraDatePickerElementFlag
-	datePicker's setDatePickerElements:((current application's NSYearMonthDayDatePickerElementFlag) + (current application's NSHourMinuteSecondDatePickerElementFlag as integer))
-	-- set initial date
-	datePicker's setDateValue:(current application's NSDate's |date|())
-	-- get the size it needs
-	set theSize to datePicker's fittingSize()
-	--resize the picker and view accordingly
-	theView's setFrameSize:theSize
-	datePicker's setFrameSize:theSize
-	-- add the picker to the view
-	theView's setSubviews:{datePicker}
-	-- create an alert
-	set theAlert to current application's NSAlert's alloc()'s init()
-	-- set up alert
-	tell theAlert
-		its setMessageText:"Pick a date"
-		its setInformativeText:"Any date"
-		its addButtonWithTitle:"OK"
-		its addButtonWithTitle:"Cancel"
-		its setAccessoryView:theView
-	end tell
-
-	-- show alert in modal loop
-	set returnCode to theAlert's runModal()
-	if returnCode = (current application's NSAlertSecondButtonReturn) then error number -128
-	-- retrieve date
-	set theDate to datePicker's dateValue() as date
-
-	return theDate
-end ui_date_input
-*)
-(*
-	Some test cases for debugging purposes
-
-
-set _testDate to date ("01-01-2023")
-set ntd to get_nearest_thursday(_testDate)
-if (ntd as string) is not "Thursday, 29 December 2022 at 00:00:00" then
-	display dialog "Testcase error: " & (_testDate as string) & " " & ntd as string
-end if
-
-set _testDate to date ("04-01-2023") -- january 4th should always be part of week 1
-set _wn to get_week_number(_testDate)
-if _wn is not 1 then
-	display dialog "Testcas error: " & (_testDate as string) & " " & _wn as string
-end if
-*)
-(*
 
 Actual script starts here
 
@@ -206,7 +144,7 @@ tell application id "DNtp"
 			set target to (quarterLabel & "/" & weekLabel)
 			set weekGroup to get record at (target)
 			if weekGroup is missing value or (type of weekGroup is not group) then
-				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:Agile:Week Ahead.dtTemplate:English.lproj:YYYYW:Weekly Results.html")
+				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:Weekly Results.html")
 				set weekGroup to create record with {name:weekLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYW|:weekLabel}
 				set newRecord to import _pathName placeholders _thePlaceHolders to weekGroup
@@ -218,7 +156,7 @@ tell application id "DNtp"
 			set dayGroup to get record at (target)
 			if dayGroup is missing value or (type of dayGroup is not group) then
 				set dayString to (ds as text)
-				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:Agile:Week Ahead.dtTemplate:English.lproj:YYYYW:D1:Daily Results.html")
+				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:Daily Results.html")
 				set dayGroup to create record with {name:dayLabel, type:group} in weekGroup
 				set _thePlaceHolders to {|YYYY-MM-DD|:dayString}
 				set newRecord to import _pathName placeholders _thePlaceHolders to dayGroup
