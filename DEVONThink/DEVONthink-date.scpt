@@ -133,18 +133,25 @@ tell application id "DNtp"
 	if not (exists current database) then error "No database open"
 	tell current database
 		try
-			set quarterLabel to ("/" & qt)
-			set quarterGroup to get record at quarterLabel
+			set quarterHead to ("/" & qt)
+			set quarterLabel to (qt as text)
+			set quarterGroup to get record at quarterHead
 			if quarterGroup is missing value or (type of quarterGroup is not group) then
 				-- the rootGroup does not exist, go and create it
 				set quarterGroup to create location quarterLabel
+				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:Quarterly Results.rtf")
+				-- set quarterGroup to create record with {name:quarterLabel, type:group} in quarterGroup
+				set _thePlaceHolders to {|YYYYQ|:quarterLabel}
+				set newRecord to import _pathName placeholders _thePlaceHolders to quarterGroup
+				set name of newRecord to "Quarterly Results - " & quarterLabel
+
 			end if
 			-- now we have the quarter for sure, create the week group
 			set weekLabel to (wk as text)
 			set target to (quarterLabel & "/" & weekLabel)
 			set weekGroup to get record at (target)
 			if weekGroup is missing value or (type of weekGroup is not group) then
-				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:Weekly Results.html")
+				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:Weekly Results.rtf")
 				set weekGroup to create record with {name:weekLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYW|:weekLabel}
 				set newRecord to import _pathName placeholders _thePlaceHolders to weekGroup
@@ -156,7 +163,7 @@ tell application id "DNtp"
 			set dayGroup to get record at (target)
 			if dayGroup is missing value or (type of dayGroup is not group) then
 				set dayString to (ds as text)
-				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:Daily Results.html")
+				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:Daily Results.rtf")
 				set dayGroup to create record with {name:dayLabel, type:group} in weekGroup
 				set _thePlaceHolders to {|YYYY-MM-DD|:dayString}
 				set newRecord to import _pathName placeholders _thePlaceHolders to dayGroup
