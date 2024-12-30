@@ -57,7 +57,7 @@ on get_week_number(theDate)
 end get_week_number
 
 on quarter_indicator(theDate)
-	set _year to year of theDate
+	set _year to year of theDate as number
 	set _quarter to create_quarter(theDate)
 	return (_year) & "Q" & (_quarter)
 end quarter_indicator
@@ -123,9 +123,9 @@ set app_support to (get path to application support from user domain as text)
 -- here ask the user for the desired date
 set targetDate to get_date_input()
 -- set targetDate to ui_date_input()
-
-set qt to quarter_indicator(targetDate)
-set wk to week_indicator(targetDate)
+set theThursday to get_nearest_thursday(targetDate)
+set qt to quarter_indicator(theThursday)
+set wk to week_indicator(theThursday)
 set dt to day_indicator(targetDate)
 set ds to day_string(targetDate)
 -- now start looking at the DEVONthink application and check the groups
