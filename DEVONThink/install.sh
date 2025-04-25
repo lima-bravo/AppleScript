@@ -26,11 +26,11 @@ docopy() {
 }
 
 # Install the scripts
-TARGET="${HOME}/Library/Application Scripts/com.devon-technologies.think3/Menu/@LB"
+TARGET="${HOME}/Library/Application Scripts/com.devon-technologies.think/Menu/@LB"
 makedir "${TARGET}"
 docopy "${TARGET}" "*.scpt"
 # Install the templates
-TARGET="${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex/@LB.dtTemplate/English.lproj"
+TARGET="${HOME}/Library/Application Support/DEVONthink/Templates.noindex/@LB.dtTemplate/English.lproj"
 makedir "${TARGET}"
 docopy "${TARGET}" "templates/*"
 
