@@ -7,9 +7,9 @@ tell application id "DNtp"
 	if not (exists current database) then error "No database open"
 	tell current database
 		try
-			set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:zettelkasten-newnote.md")
+			set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:zettelkasten-newnote.md")
 			set _thePlaceHolders to {|%title%|:theName}
-			set newRecord to import _pathName placeholders _thePlaceHolders to current group
+			set newRecord to import path _pathName placeholders _thePlaceHolders to current group
 			set name of newRecord to theName
 		on error errMSg
 			display dialog "ERROR: " & errMSg

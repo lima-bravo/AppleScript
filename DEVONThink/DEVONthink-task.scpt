@@ -1,19 +1,14 @@
 #@osa-lang:AppleScript
 (*
-  Create a diary entry with weekly and daily focus, order in quarters and weeks, based on date provided in the dialog.
+DEVONthink-task
 
-	Using input from:
-  	- https://macscripter.net/viewtopic.php?id=24737
-	- https://discourse.devontechnologies.com/t/read-only-file-system-error-when-calling-shell-script-within-applescript/73923/8
-	- https://discourse.devontechnologies.com/t/applescript-access-denied-issues-with-import-to/73673
- *)
-(*
--- redundant code
- --needed for ui_get_date
-use scripting additions
-use framework "Foundation"
-use framework "AppKit"
+Create a new task in the current Diary of the database
+
+Based on code from DEVONthink-date
+
+
 *)
+
 (*
 
 Subroutine Block
@@ -93,21 +88,7 @@ end day_string
 
 on get_date_input()
 	set todaysDate to current date
-
-	set _todayDay to day of todaysDate as number
-	set _todayMonth to month of todaysDate as number
-	set _todayYear to year of todaysDate as number
-
-	set _todayString to ((_todayYear as string) & "-" & (_todayMonth as string) & "-" & (_todayDay as string))
-
-	display dialog "What is the target date?" & return & return & "format YYYY-MM-DD" & return default answer _todayString with title "Target date"
-	set dueDate to (the text returned of the result)
-
 	set taskDueDate to todaysDate
-	set the year of taskDueDate to word 1 of dueDate
-	set the month of taskDueDate to word 2 of dueDate
-	set the day of taskDueDate to word 3 of dueDate
-
 	return taskDueDate
 end get_date_input
 
@@ -119,9 +100,11 @@ Actual script starts here
 
 
 set app_support to (get path to application support from user domain as text)
+-- ask the user for the TaskDescription
+display dialog "Enter the topic for the task:" default answer ""
+set taskDescription to text returned of result
 -- set targetDate to current date
--- here ask the user for the desired date
-set targetDate to get_date_input()
+set targetDate to current date
 -- set targetDate to ui_date_input()
 set theThursday to get_nearest_thursday(targetDate)
 set qt to quarter_indicator(theThursday)
@@ -139,7 +122,7 @@ tell application id "DNtp"
 			if quarterGroup is missing value or (type of quarterGroup is not group) then
 				-- the rootGroup does not exist, go and create it
 				set quarterGroup to create location quarterLabel
-				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:Quarterly Results.rtf")
+				set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Quarterly Results.rtf")
 				-- set quarterGroup to create record with {name:quarterLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYQ|:quarterLabel}
 				set newRecord to import path _pathName placeholders _thePlaceHolders to quarterGroup
@@ -151,7 +134,7 @@ tell application id "DNtp"
 			set target to (quarterLabel & "/" & weekLabel)
 			set weekGroup to get record at (target)
 			if weekGroup is missing value or (type of weekGroup is not group) then
-				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:Weekly Results.rtf")
+				set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Weekly Results.rtf")
 				set weekGroup to create record with {name:weekLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYW|:weekLabel}
 				set newRecord to import path _pathName placeholders _thePlaceHolders to weekGroup
@@ -169,6 +152,11 @@ tell application id "DNtp"
 				set newRecord to import path _pathName placeholders _thePlaceHolders to dayGroup
 				set name of newRecord to "Daily Results - " & dayString
 			end if
+			-- now create the task, replacing TaskDescription with the provided taskDescription
+			set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Task.rtf")
+			set _thePlaceHolders to {|%TaskDescription%|:taskDescription}
+			set newRecord to import path _pathName placeholders _thePlaceHolders to dayGroup
+			set name of newRecord to "Task - " & taskDescription
 		on error errMSg
 			display dialog "ERROR: " & errMSg
 		end try
