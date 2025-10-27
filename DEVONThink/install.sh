@@ -26,12 +26,28 @@ docopy() {
 }
 
 # Install the scripts
-TARGET="${HOME}/Library/Application Scripts/com.devon-technologies.think/Menu/@LB"
+if [[ -d "${HOME}/Library/Application Scripts/com.devon-technologies.think3/Menu" ]]; then
+	# DEVONthink 3
+	TARGET="${HOME}/Library/Application Scripts/com.devon-technologies.think3/Menu/@LB"
+elif [[ -d "${HOME}/Library/Application Scripts/com.devon-technologies.think/Menu" ]]; then
+	# DEVONthink 4
+	TARGET="${HOME}/Library/Application Scripts/com.devon-technologies.think/Menu/@LB"
+else
+	echo "No DEVONthink installation found"
+	exit 1
+fi
 makedir "${TARGET}"
 docopy "${TARGET}" "*.scpt"
 # Install the templates
-TARGET="${HOME}/Library/Application Support/DEVONthink/Templates.noindex/@LB.dtTemplate/English.lproj"
+if [[ -d "${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex" ]]; then
+	# DEVONthink 3
+	TARGET="${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex/@LB.dtTemplate/English.lproj"
+elif [[ -d "${HOME}/Library/Application Support/DEVONthink/Templates.noindex" ]]; then
+	# DEVONthink 4
+	TARGET="${HOME}/Library/Application Support/DEVONthink/Templates.noindex/@LB.dtTemplate/English.lproj"
+else
+	echo "No DEVONthink templates installation found"
+	exit 1
+fi
 makedir "${TARGET}"
 docopy "${TARGET}" "templates/*"
-
-
