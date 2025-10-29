@@ -46,7 +46,7 @@ on get_week_number(theDate)
 	set theThursday to get_nearest_thursday(theDate)
 	-- copy theThursday to yearStart
 	set yearStart to year_start(theThursday)
-	set theWeekNumber to round (((theThursday - yearStart) / 86400 + 1) / 7)
+	set theWeekNumber to round (((theThursday - yearStart) / 86400 + 1) / 7) rounding up
 	return theWeekNumber
 end get_week_number
 
@@ -70,7 +70,7 @@ on day_formatter(theDate, _sep)
 	set _year to year of theDate
 	set _month to month of theDate as number
 	set _day to day of theDate as number
-
+	
 	set _ms to format00(_month)
 	set _ds to format00(_day)
 	return ((_year) & _sep & (_ms) & _sep & (_ds))
@@ -100,17 +100,17 @@ on get_date_input()
 	set _todayDay to day of todaysDate as number
 	set _todayMonth to month of todaysDate as number
 	set _todayYear to year of todaysDate as number
-
+	
 	set _todayString to ((_todayYear as string) & "-" & (_todayMonth as string) & "-" & (_todayDay as string))
-
+	
 	display dialog "What is the target date?" & return & return & "format YYYY-MM-DD" & return default answer _todayString with title "Target date"
 	set dueDate to (the text returned of the result)
-
+	
 	set taskDueDate to todaysDate
 	set the year of taskDueDate to word 1 of dueDate
 	set the month of taskDueDate to word 2 of dueDate
 	set the day of taskDueDate to word 3 of dueDate
-
+	
 	return taskDueDate
 end get_date_input
 
@@ -120,26 +120,37 @@ Actual script starts here
 
 *)
 
-
+-- log "Starting "
 set app_support to (get path to application support from user domain as text)
 set template_base to get_template_base(app_support)
 -- set targetDate to current date
 -- here ask the user for the desired date
 set targetDate to get_date_input()
+-- log "targetDate: " & (targetDate as string)
+
 -- set targetDate to ui_date_input()
 set theThursday to get_nearest_thursday(targetDate)
 set qt to quarter_indicator(theThursday)
 set wk to week_indicator(theThursday)
 set dt to day_indicator(targetDate)
 set ds to day_string(targetDate)
+-- log "Logging " & " " & qt & " " & wk & " " & dt & " " & ds
 -- now start looking at the DEVONthink application and check the groups
 tell application id "DNtp"
 	if not (exists current database) then error "No database open"
+	(*
+	tell current database
+		log "Database name: " & name
+		log "Database path: " & path
+		log "Database UUID: " & uuid
+	end tell
+	*)
 	tell current database
 		try
 			set quarterHead to ("/" & qt)
 			set quarterLabel to (qt as text)
 			set quarterGroup to get record at quarterHead
+			-- log "QuarterGroup " & name of quarterGroup
 			if quarterGroup is missing value or (type of quarterGroup is not group) then
 				-- the rootGroup does not exist, go and create it
 				set quarterGroup to create location quarterLabel
@@ -148,12 +159,13 @@ tell application id "DNtp"
 				set _thePlaceHolders to {|YYYYQ|:quarterLabel}
 				set newRecord to import _pathName placeholders _thePlaceHolders to quarterGroup
 				set name of newRecord to "Quarterly Results - " & quarterLabel
-
+				
 			end if
 			-- now we have the quarter for sure, create the week group
 			set weekLabel to (wk as text)
 			set target to (quarterLabel & "/" & weekLabel)
 			set weekGroup to get record at (target)
+			-- log "weekGroup " & name of weekGroup
 			if weekGroup is missing value or (type of weekGroup is not group) then
 				set _pathName to (app_support & template_base & "@LB.dtTemplate:English.lproj:Weekly Results.rtf")
 				set weekGroup to create record with {name:weekLabel, type:group} in quarterGroup
