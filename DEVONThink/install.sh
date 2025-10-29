@@ -25,6 +25,24 @@ docopy() {
 	done 
 }
 
+compile_scripts() {
+	# Compile all .applescript files to .scpt files
+	for f in *.applescript; do
+		if [[ -f "$f" ]]; then
+			BASENAME="${f%.applescript}"
+			SCPTFILE="${BASENAME}.scpt"
+			echo "Compiling $f to ${SCPTFILE}"
+			osacompile -o "${SCPTFILE}" "$f"
+			if [[ $? -ne 0 ]]; then
+				echo "ERROR: Failed to compile $f"
+				exit 1
+			fi
+		fi
+	done
+}
+
+
+
 # Install the scripts
 if [[ -d "${HOME}/Library/Application Scripts/com.devon-technologies.think3/Menu" ]]; then
 	# DEVONthink 3
@@ -36,9 +54,16 @@ else
 	echo "No DEVONthink installation found"
 	exit 1
 fi
+
+# Compile the AppleScript source files
+compile_scripts
+# and move them to the target directory
 makedir "${TARGET}"
 docopy "${TARGET}" "*.scpt"
-# Install the templates
+# and remove the compiled files
+rm *.scpt
+#
+# Next, install the templates
 if [[ -d "${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex" ]]; then
 	# DEVONthink 3
 	TARGET="${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex/@LB.dtTemplate/English.lproj"

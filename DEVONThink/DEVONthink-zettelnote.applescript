@@ -1,4 +1,3 @@
-#@osa-lang:AppleScript
 display dialog "Name your note..." default answer ""
 set theName to text returned of result
 
@@ -9,7 +8,7 @@ tell application id "DNtp"
 		try
 			set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:zettelkasten-newnote.md")
 			set _thePlaceHolders to {|%title%|:theName}
-			set newRecord to import path _pathName placeholders _thePlaceHolders to current group
+			set newRecord to import _pathName placeholders _thePlaceHolders to current group
 			set name of newRecord to theName
 		on error errMSg
 			display dialog "ERROR: " & errMSg

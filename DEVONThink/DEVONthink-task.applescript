@@ -28,7 +28,7 @@ end year_start
 on create_quarter(theDate)
 	set theThursday to get_nearest_thursday(theDate)
 	set _month to month of theThursday as number
-	set quarter to round ((_month - 1) / 3 + 1) rounding down
+	set quarter to ((_month - 1) div 3) + 1
 	return quarter
 end create_quarter
 
@@ -47,7 +47,7 @@ on get_week_number(theDate)
 	set theThursday to get_nearest_thursday(theDate)
 	-- copy theThursday to yearStart
 	set yearStart to year_start(theThursday)
-	set theWeekNumber to round (((theThursday - yearStart) / 86400 + 1) / 7) rounding up
+	set theWeekNumber to round (((theThursday - yearStart) / 86400 + 1) / 7)
 	return theWeekNumber
 end get_week_number
 
@@ -117,7 +117,7 @@ tell application id "DNtp"
 	tell current database
 		try
 			set quarterHead to ("/" & qt)
-			set quarterLabel to (qt as rich text)
+			set quarterLabel to (qt as text)
 			set quarterGroup to get record at quarterHead
 			if quarterGroup is missing value or (type of quarterGroup is not group) then
 				-- the rootGroup does not exist, go and create it
@@ -125,37 +125,37 @@ tell application id "DNtp"
 				set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Quarterly Results.rtf")
 				-- set quarterGroup to create record with {name:quarterLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYQ|:quarterLabel}
-				set newRecord to import path _pathName placeholders _thePlaceHolders to quarterGroup
+				set newRecord to import _pathName placeholders _thePlaceHolders to quarterGroup
 				set name of newRecord to "Quarterly Results - " & quarterLabel
 
 			end if
 			-- now we have the quarter for sure, create the week group
-			set weekLabel to (wk as rich text)
+			set weekLabel to (wk as text)
 			set target to (quarterLabel & "/" & weekLabel)
 			set weekGroup to get record at (target)
 			if weekGroup is missing value or (type of weekGroup is not group) then
 				set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Weekly Results.rtf")
 				set weekGroup to create record with {name:weekLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYW|:weekLabel}
-				set newRecord to import path _pathName placeholders _thePlaceHolders to weekGroup
+				set newRecord to import _pathName placeholders _thePlaceHolders to weekGroup
 				set name of newRecord to "Weekly Results - " & weekLabel
 			end if
 			-- now create the target record if it does not exist
-			set dayLabel to (dt as rich text)
+			set dayLabel to (dt as text)
 			set target to (quarterLabel & "/" & weekLabel & "/" & dayLabel)
 			set dayGroup to get record at (target)
 			if dayGroup is missing value or (type of dayGroup is not group) then
-				set dayString to (ds as rich text)
+				set dayString to (ds as text)
 				set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Daily Results.rtf")
 				set dayGroup to create record with {name:dayLabel, type:group} in weekGroup
 				set _thePlaceHolders to {|YYYY-MM-DD|:dayString}
-				set newRecord to import path _pathName placeholders _thePlaceHolders to dayGroup
+				set newRecord to import _pathName placeholders _thePlaceHolders to dayGroup
 				set name of newRecord to "Daily Results - " & dayString
 			end if
 			-- now create the task, replacing TaskDescription with the provided taskDescription
 			set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Task.rtf")
 			set _thePlaceHolders to {|%TaskDescription%|:taskDescription}
-			set newRecord to import path _pathName placeholders _thePlaceHolders to dayGroup
+			set newRecord to import _pathName placeholders _thePlaceHolders to dayGroup
 			set name of newRecord to "Task - " & taskDescription
 		on error errMSg
 			display dialog "ERROR: " & errMSg

@@ -7,13 +7,7 @@
 	- https://discourse.devontechnologies.com/t/read-only-file-system-error-when-calling-shell-script-within-applescript/73923/8
 	- https://discourse.devontechnologies.com/t/applescript-access-denied-issues-with-import-to/73673
  *)
-(*
--- redundant code
- --needed for ui_get_date
-use scripting additions
-use framework "Foundation"
-use framework "AppKit"
-*)
+
 (*
 
 Subroutine Block
@@ -33,7 +27,7 @@ end year_start
 on create_quarter(theDate)
 	set theThursday to get_nearest_thursday(theDate)
 	set _month to month of theThursday as number
-	set quarter to round ((_month - 1) / 3 + 1) rounding down
+	set quarter to ((_month - 1) div 3) + 1
 	return quarter
 end create_quarter
 
@@ -52,7 +46,7 @@ on get_week_number(theDate)
 	set theThursday to get_nearest_thursday(theDate)
 	-- copy theThursday to yearStart
 	set yearStart to year_start(theThursday)
-	set theWeekNumber to round (((theThursday - yearStart) / 86400 + 1) / 7) rounding up
+	set theWeekNumber to round (((theThursday - yearStart) / 86400 + 1) / 7)
 	return theWeekNumber
 end get_week_number
 
@@ -90,10 +84,19 @@ on day_string(theDate)
 	return day_formatter(theDate, "-")
 end day_string
 
+on get_template_base(app_support)
+	set dt3_path to (app_support & "DEVONthink 3:Templates.noindex") as string
+	try
+		alias dt3_path
+		return "DEVONthink 3:Templates.noindex:"
+	on error
+		return "DEVONthink:Templates.noindex:"
+	end try
+end get_template_base
 
 on get_date_input()
 	set todaysDate to current date
-
+	
 	set _todayDay to day of todaysDate as number
 	set _todayMonth to month of todaysDate as number
 	set _todayYear to year of todaysDate as number
@@ -119,6 +122,7 @@ Actual script starts here
 
 
 set app_support to (get path to application support from user domain as text)
+set template_base to get_template_base(app_support)
 -- set targetDate to current date
 -- here ask the user for the desired date
 set targetDate to get_date_input()
@@ -134,39 +138,39 @@ tell application id "DNtp"
 	tell current database
 		try
 			set quarterHead to ("/" & qt)
-			set quarterLabel to (qt as rich text)
+			set quarterLabel to (qt as text)
 			set quarterGroup to get record at quarterHead
 			if quarterGroup is missing value or (type of quarterGroup is not group) then
 				-- the rootGroup does not exist, go and create it
 				set quarterGroup to create location quarterLabel
-				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:Quarterly Results.rtf")
+				set _pathName to (app_support & template_base & "@LB.dtTemplate:English.lproj:Quarterly Results.rtf")
 				-- set quarterGroup to create record with {name:quarterLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYQ|:quarterLabel}
-				set newRecord to import path _pathName placeholders _thePlaceHolders to quarterGroup
+				set newRecord to import _pathName placeholders _thePlaceHolders to quarterGroup
 				set name of newRecord to "Quarterly Results - " & quarterLabel
 
 			end if
 			-- now we have the quarter for sure, create the week group
-			set weekLabel to (wk as rich text)
+			set weekLabel to (wk as text)
 			set target to (quarterLabel & "/" & weekLabel)
 			set weekGroup to get record at (target)
 			if weekGroup is missing value or (type of weekGroup is not group) then
-				set _pathName to (app_support & "DEVONthink 3:Templates.noindex:@LB.dtTemplate:English.lproj:Weekly Results.rtf")
+				set _pathName to (app_support & template_base & "@LB.dtTemplate:English.lproj:Weekly Results.rtf")
 				set weekGroup to create record with {name:weekLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYW|:weekLabel}
-				set newRecord to import path _pathName placeholders _thePlaceHolders to weekGroup
+				set newRecord to import _pathName placeholders _thePlaceHolders to weekGroup
 				set name of newRecord to "Weekly Results - " & weekLabel
 			end if
 			-- now create the target record if it does not exist
-			set dayLabel to (dt as rich text)
+			set dayLabel to (dt as text)
 			set target to (quarterLabel & "/" & weekLabel & "/" & dayLabel)
 			set dayGroup to get record at (target)
 			if dayGroup is missing value or (type of dayGroup is not group) then
-				set dayString to (ds as rich text)
-				set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Daily Results.rtf")
+				set dayString to (ds as text)
+				set _pathName to (app_support & template_base & "@LB.dtTemplate:English.lproj:Daily Results.rtf")
 				set dayGroup to create record with {name:dayLabel, type:group} in weekGroup
 				set _thePlaceHolders to {|YYYY-MM-DD|:dayString}
-				set newRecord to import path _pathName placeholders _thePlaceHolders to dayGroup
+				set newRecord to import _pathName placeholders _thePlaceHolders to dayGroup
 				set name of newRecord to "Daily Results - " & dayString
 			end if
 		on error errMSg
