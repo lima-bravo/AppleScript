@@ -28,7 +28,7 @@ end year_start
 on create_quarter(theDate)
 	set theThursday to get_nearest_thursday(theDate)
 	set _month to month of theThursday as number
-	set quarter to ((_month - 1) div 3) + 1
+	set quarter to round ((_month - 1) / 3 + 1) rounding down
 	return quarter
 end create_quarter
 
@@ -47,7 +47,7 @@ on get_week_number(theDate)
 	set theThursday to get_nearest_thursday(theDate)
 	-- copy theThursday to yearStart
 	set yearStart to year_start(theThursday)
-	set theWeekNumber to round (((theThursday - yearStart) / 86400 + 1) / 7)
+	set theWeekNumber to round (((theThursday - yearStart) / 86400 + 1) / 7) rounding up
 	return theWeekNumber
 end get_week_number
 
@@ -84,7 +84,6 @@ end day_indicator
 on day_string(theDate)
 	return day_formatter(theDate, "-")
 end day_string
-
 
 on get_date_input()
 	set todaysDate to current date

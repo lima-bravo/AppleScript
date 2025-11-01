@@ -27,7 +27,7 @@ end year_start
 on create_quarter(theDate)
 	set theThursday to get_nearest_thursday(theDate)
 	set _month to month of theThursday as number
-	set quarter to ((_month - 1) div 3) + 1
+	set quarter to round ((_month - 1) / 3 + 1) rounding down
 	return quarter
 end create_quarter
 
@@ -70,7 +70,7 @@ on day_formatter(theDate, _sep)
 	set _year to year of theDate
 	set _month to month of theDate as number
 	set _day to day of theDate as number
-	
+
 	set _ms to format00(_month)
 	set _ds to format00(_day)
 	return ((_year) & _sep & (_ms) & _sep & (_ds))
