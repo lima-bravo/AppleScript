@@ -1,14 +1,18 @@
-o
-on get_template_base(app_support)
-	set lb_path to "Templates.noindex:@LB.dtTemplate:English.lproj:"
-	-- set dt3_path to (app_support & "DEVONthink 3:" & lb_path) as string
-	try
-		-- alias dt3_path
-		return "DEVONthink 3:" & lb_path
-	on error
-		return "DEVONthink:" & lb_path
-	end try
-end get_template_base
+(*
+  Create a new zettelkasten note in DEVONthink
+*)
+
+(*
+  Load common library
+*)
+
+set scriptPath to POSIX path of (path to me)
+set AppleScript's text item delimiters to "/"
+set pathItems to text items of scriptPath
+set AppleScript's text item delimiters to "/"
+set scriptDir to (items 1 thru -2 of pathItems as string) & "/"
+set commonLibPath to POSIX file (scriptDir & "DEVONthink-common.applescript")
+set commonLib to load script commonLibPath
 
 (*
 
@@ -17,7 +21,7 @@ Actual script starts here
 *)
 
 set app_support to (get path to application support from user domain as text)
-set template_base to get_template_base(app_support)
+set template_base to commonLib's get_template_base(app_support)
 
 display dialog ("Name your note...[" & template_base & "]") default answer ""
 set theName to text returned of result

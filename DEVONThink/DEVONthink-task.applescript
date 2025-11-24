@@ -1,4 +1,3 @@
-#@osa-lang:AppleScript
 (*
 DEVONthink-task
 
@@ -11,97 +10,23 @@ Based on code from DEVONthink-date
 
 (*
 
-Subroutine Block
+Load common library
 
 *)
+(*
+set scriptPath to POSIX path of (path to me)
+set AppleScript's text item delimiters to "/"
+set pathItems to text items of scriptPath
+set AppleScript's text item delimiters to "/"
+set scriptDir to (items 1 thru -2 of pathItems as string) & "/"
+set commonLibPath to POSIX file (scriptDir & "DEVONthink-common.applescript")
+*)
 
+set scriptPosixPath to POSIX path of (path to me)
+set scriptFolderPosix to do shell script "dirname " & quoted form of scriptPosixPath
 
-on get_template_base(app_support)
-	set lb_path to "Templates.noindex:@LB.dtTemplate:English.lproj:"
-	-- set dt3_path to (app_support & "DEVONthink 3:" & lb_path) as string
-	try
-		-- alias dt3_path
-		return "DEVONthink 3:" & lb_path
-	on error
-		return "DEVONthink:" & lb_path
-	end try
-end get_template_base
-
-on year_start(theDate)
-	copy theDate to yearStart
-	set yearStart's month to January
-	set yearStart's day to 1
-	set yearStart's hours to 0
-	set yearStart's minutes to 0
-	set yearStart's seconds to 0
-	return yearStart
-end year_start
-
-on create_quarter(theDate)
-	set theThursday to get_nearest_thursday(theDate)
-	set _month to month of theThursday as number
-	set quarter to round ((_month - 1) / 3 + 1) rounding down
-	return quarter
-end create_quarter
-
-on get_nearest_thursday(theDate)
-	copy theDate to theThursday -- use copy to duplicate the variable, otherwise it's just the reference!
-	set twd to weekday of theThursday as number
-	if twd is 1 then
-		set twd to 8
-	end if
-	set theThursday to (theThursday + (5 - twd) * 86400)
-	return theThursday
-end get_nearest_thursday
-
-on get_week_number(theDate)
-	-- calculate week number for the given thursday
-	set theThursday to get_nearest_thursday(theDate)
-	-- copy theThursday to yearStart
-	set yearStart to year_start(theThursday)
-	set theWeekNumber to round (((theThursday - yearStart) / 86400 + 1) / 7) rounding up
-	return theWeekNumber
-end get_week_number
-
-on quarter_indicator(theDate)
-	set _year to year of theDate as number
-	set _quarter to create_quarter(theDate)
-	return (_year) & "Q" & (_quarter)
-end quarter_indicator
-
-on format00(theNumber)
-	return (text -2 thru -1 of ("00" & theNumber))
-end format00
-
-on week_indicator(theDate)
-	set _year to year of theDate
-	set _week to get_week_number(theDate)
-	return (_year) & "W" & format00(_week) -- create a string with the leading zeros
-end week_indicator
-
-on day_formatter(theDate, _sep)
-	set _year to year of theDate
-	set _month to month of theDate as number
-	set _day to day of theDate as number
-	
-	set _ms to format00(_month)
-	set _ds to format00(_day)
-	return ((_year) & _sep & (_ms) & _sep & (_ds))
-end day_formatter
-
-on day_indicator(theDate)
-	return day_formatter(theDate, "")
-end day_indicator
-
-on day_string(theDate)
-	return day_formatter(theDate, "-")
-end day_string
-
-on get_date_input()
-	set todaysDate to current date
-	set taskDueDate to todaysDate
-	return taskDueDate
-end get_date_input
+set commonLibPath to scriptFolderPosix & "/DEVONthink-common.scpt"
+set commonLib to load script (POSIX file commonLibPath)
 
 (*
 
@@ -111,7 +36,7 @@ Actual script starts here
 
 
 set app_support to (get path to application support from user domain as text)
-set template_base to get_template_base(app_support)
+set template_base to commonLib's get_template_base(app_support)
 
 -- ask the user for the TaskDescription
 display dialog "Enter the topic for the task:" default answer ""
@@ -119,11 +44,11 @@ set taskDescription to text returned of result
 -- set targetDate to current date
 set targetDate to current date
 -- set targetDate to ui_date_input()
-set theThursday to get_nearest_thursday(targetDate)
-set qt to quarter_indicator(theThursday)
-set wk to week_indicator(theThursday)
-set dt to day_indicator(targetDate)
-set ds to day_string(targetDate)
+set theThursday to commonLib's get_nearest_thursday(targetDate)
+set qt to commonLib's quarter_indicator(theThursday)
+set wk to commonLib's week_indicator(theThursday)
+set dt to commonLib's day_indicator(targetDate)
+set ds to commonLib's day_string(targetDate)
 -- now start looking at the DEVONthink application and check the groups
 tell application id "DNtp"
 	if not (exists current database) then error "No database open"
