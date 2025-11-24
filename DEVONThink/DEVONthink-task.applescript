@@ -18,9 +18,9 @@ Subroutine Block
 
 on get_template_base(app_support)
 	set lb_path to "Templates.noindex:@LB.dtTemplate:English.lproj"
-	set dt3_path to (app_support & "DEVONthink 3:" & lb_path) as string
+	-- set dt3_path to (app_support & "DEVONthink 3:" & lb_path) as string
 	try
-		alias dt3_path
+		-- alias dt3_path
 		return "DEVONthink 3:" & lb_path
 	on error
 		return "DEVONthink:" & lb_path
