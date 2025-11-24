@@ -13,14 +13,6 @@ Based on code from DEVONthink-date
 Load common library
 
 *)
-(*
-set scriptPath to POSIX path of (path to me)
-set AppleScript's text item delimiters to "/"
-set pathItems to text items of scriptPath
-set AppleScript's text item delimiters to "/"
-set scriptDir to (items 1 thru -2 of pathItems as string) & "/"
-set commonLibPath to POSIX file (scriptDir & "DEVONthink-common.applescript")
-*)
 
 set scriptPosixPath to POSIX path of (path to me)
 set scriptFolderPosix to do shell script "dirname " & quoted form of scriptPosixPath
