@@ -15,6 +15,17 @@ Subroutine Block
 
 *)
 
+
+on get_template_base(app_support)
+	set dt3_path to (app_support & "DEVONthink 3:Templates.noindex") as string
+	try
+		alias dt3_path
+		return "DEVONthink 3:Templates.noindex:"
+	on error
+		return "DEVONthink:Templates.noindex:"
+	end try
+end get_template_base
+
 on year_start(theDate)
 	copy theDate to yearStart
 	set yearStart's month to January
@@ -99,6 +110,8 @@ Actual script starts here
 
 
 set app_support to (get path to application support from user domain as text)
+set template_base to get_template_base(app_support)
+
 -- ask the user for the TaskDescription
 display dialog "Enter the topic for the task:" default answer ""
 set taskDescription to text returned of result
