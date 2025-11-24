@@ -1,13 +1,14 @@
+o
 on get_template_base(app_support)
-	set dt3_path to (app_support & "DEVONthink 3:Templates.noindex") as string
+	set lb_path to "Templates.noindex:@LB.dtTemplate:English.lproj:"
+	-- set dt3_path to (app_support & "DEVONthink 3:" & lb_path) as string
 	try
-		alias dt3_path
-		return "DEVONthink 3:Templates.noindex:"
+		-- alias dt3_path
+		return "DEVONthink 3:" & lb_path
 	on error
-		return "DEVONthink:Templates.noindex:"
+		return "DEVONthink:" & lb_path
 	end try
 end get_template_base
-
 
 (*
 
@@ -26,7 +27,7 @@ tell application id "DNtp"
 	if not (exists current database) then error "No database open"
 	tell current database
 		try
-			set _pathName to (app_support & template_base & "@LB.dtTemplate:English.lproj:zettelkasten-newnote.md")
+			set _pathName to (app_support & template_base & "zettelkasten-newnote.md")
 			set _thePlaceHolders to {|%title%|:theName}
 			set newRecord to import _pathName placeholders _thePlaceHolders to current group
 			set name of newRecord to theName

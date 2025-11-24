@@ -84,13 +84,15 @@ on day_string(theDate)
 	return day_formatter(theDate, "-")
 end day_string
 
+
 on get_template_base(app_support)
-	set dt3_path to (app_support & "DEVONthink 3:Templates.noindex") as string
+	set lb_path to "Templates.noindex:@LB.dtTemplate:English.lproj:"
+	-- set dt3_path to (app_support & "DEVONthink 3:" & lb_path) as string
 	try
-		alias dt3_path
-		return "DEVONthink 3:Templates.noindex:"
+		-- alias dt3_path
+		return "DEVONthink 3:" & lb_path
 	on error
-		return "DEVONthink:Templates.noindex:"
+		return "DEVONthink:" & lb_path
 	end try
 end get_template_base
 
@@ -154,7 +156,7 @@ tell application id "DNtp"
 			if quarterGroup is missing value or (type of quarterGroup is not group) then
 				-- the rootGroup does not exist, go and create it
 				set quarterGroup to create location quarterLabel
-				set _pathName to (app_support & template_base & "@LB.dtTemplate:English.lproj:Quarterly Results.rtf")
+				set _pathName to (app_support & template_base & "Quarterly Results.rtf")
 				-- set quarterGroup to create record with {name:quarterLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYQ|:quarterLabel}
 				set newRecord to import _pathName placeholders _thePlaceHolders to quarterGroup
@@ -167,7 +169,7 @@ tell application id "DNtp"
 			set weekGroup to get record at (target)
 			-- log "weekGroup " & name of weekGroup
 			if weekGroup is missing value or (type of weekGroup is not group) then
-				set _pathName to (app_support & template_base & "@LB.dtTemplate:English.lproj:Weekly Results.rtf")
+				set _pathName to (app_support & template_base & "Weekly Results.rtf")
 				set weekGroup to create record with {name:weekLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYW|:weekLabel}
 				set newRecord to import _pathName placeholders _thePlaceHolders to weekGroup
@@ -179,7 +181,7 @@ tell application id "DNtp"
 			set dayGroup to get record at (target)
 			if dayGroup is missing value or (type of dayGroup is not group) then
 				set dayString to (ds as text)
-				set _pathName to (app_support & template_base & "@LB.dtTemplate:English.lproj:Daily Results.rtf")
+				set _pathName to (app_support & template_base & "Daily Results.rtf")
 				set dayGroup to create record with {name:dayLabel, type:group} in weekGroup
 				set _thePlaceHolders to {|YYYY-MM-DD|:dayString}
 				set newRecord to import _pathName placeholders _thePlaceHolders to dayGroup

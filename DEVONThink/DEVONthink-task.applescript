@@ -17,7 +17,7 @@ Subroutine Block
 
 
 on get_template_base(app_support)
-	set lb_path to "Templates.noindex:@LB.dtTemplate:English.lproj"
+	set lb_path to "Templates.noindex:@LB.dtTemplate:English.lproj:"
 	-- set dt3_path to (app_support & "DEVONthink 3:" & lb_path) as string
 	try
 		-- alias dt3_path
@@ -83,7 +83,7 @@ on day_formatter(theDate, _sep)
 	set _year to year of theDate
 	set _month to month of theDate as number
 	set _day to day of theDate as number
-
+	
 	set _ms to format00(_month)
 	set _ds to format00(_day)
 	return ((_year) & _sep & (_ms) & _sep & (_ds))
@@ -140,7 +140,7 @@ tell application id "DNtp"
 				set _thePlaceHolders to {|YYYYQ|:quarterLabel}
 				set newRecord to import _pathName placeholders _thePlaceHolders to quarterGroup
 				set name of newRecord to "Quarterly Results - " & quarterLabel
-
+				
 			end if
 			-- now we have the quarter for sure, create the week group
 			set weekLabel to (wk as text)
