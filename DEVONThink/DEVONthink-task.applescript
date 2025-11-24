@@ -134,7 +134,7 @@ tell application id "DNtp"
 			if quarterGroup is missing value or (type of quarterGroup is not group) then
 				-- the rootGroup does not exist, go and create it
 				set quarterGroup to create location quarterLabel
-				set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Quarterly Results.rtf")
+				set _pathName to (app_support & template_base & "Templates.noindex:@LB.dtTemplate:English.lproj:Quarterly Results.rtf")
 				-- set quarterGroup to create record with {name:quarterLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYQ|:quarterLabel}
 				set newRecord to import _pathName placeholders _thePlaceHolders to quarterGroup
@@ -146,7 +146,7 @@ tell application id "DNtp"
 			set target to (quarterLabel & "/" & weekLabel)
 			set weekGroup to get record at (target)
 			if weekGroup is missing value or (type of weekGroup is not group) then
-				set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Weekly Results.rtf")
+				set _pathName to (app_support & template_base & "Templates.noindex:@LB.dtTemplate:English.lproj:Weekly Results.rtf")
 				set weekGroup to create record with {name:weekLabel, type:group} in quarterGroup
 				set _thePlaceHolders to {|YYYYW|:weekLabel}
 				set newRecord to import _pathName placeholders _thePlaceHolders to weekGroup
@@ -158,14 +158,14 @@ tell application id "DNtp"
 			set dayGroup to get record at (target)
 			if dayGroup is missing value or (type of dayGroup is not group) then
 				set dayString to (ds as text)
-				set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Daily Results.rtf")
+				set _pathName to (app_support & template_base & "Templates.noindex:@LB.dtTemplate:English.lproj:Daily Results.rtf")
 				set dayGroup to create record with {name:dayLabel, type:group} in weekGroup
 				set _thePlaceHolders to {|YYYY-MM-DD|:dayString}
 				set newRecord to import _pathName placeholders _thePlaceHolders to dayGroup
 				set name of newRecord to "Daily Results - " & dayString
 			end if
 			-- now create the task, replacing TaskDescription with the provided taskDescription
-			set _pathName to (app_support & "DEVONthink:Templates.noindex:@LB.dtTemplate:English.lproj:Task.rtf")
+			set _pathName to (app_support & template_base & "Templates.noindex:@LB.dtTemplate:English.lproj:Task.rtf")
 			set _thePlaceHolders to {|%TaskDescription%|:taskDescription}
 			set newRecord to import _pathName placeholders _thePlaceHolders to dayGroup
 			set name of newRecord to "Task - " & taskDescription
