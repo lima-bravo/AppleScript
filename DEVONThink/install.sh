@@ -22,14 +22,17 @@ process_scripts() {
 makedir() {
 	# must be called with parenthesis to accomodate space and special characters
 	TARGET=${1}
-	if [[ ! -d "${TARGET}" ]]; then
-		mkdir -p "$TARGET"
+	# check if the target directory exists, and empty it
+	if [[ -d "${TARGET}" ]]; then
+		rm -rf "${TARGET}"
 	fi
+	# create the target directory
+	mkdir -p "$TARGET"
 }
 
 make_copy() {
 	TARGET="${1}"
-	f="$1"
+	f="$2"
 	echo "Copying $f to ${TARGET}"
 	cp "$f" "${TARGET}/"
 }
@@ -74,11 +77,15 @@ else
 	exit 1
 fi
 
+# now create the target directory
+makedir "${TARGET}"
+
 # Compile the AppleScript source files and place them in the target directory
 process_scripts
 
 #
 # Next, install the templates
+# 
 if [[ -d "${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex" ]]; then
 	# DEVONthink 3
 	TARGET="${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex/@LB.dtTemplate/English.lproj"
