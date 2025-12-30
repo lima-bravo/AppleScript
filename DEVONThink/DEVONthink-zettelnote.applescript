@@ -11,7 +11,7 @@ Load common library
 set scriptPosixPath to POSIX path of (path to me)
 set scriptFolderPosix to do shell script "dirname " & quoted form of scriptPosixPath
 
-set commonLibPath to scriptFolderPosix & "/DEVONthink-common.scpt"
+set commonLibPath to scriptFolderPosix & "/.DEVONthink-common.scpt"
 set commonLib to load script (POSIX file commonLibPath)
 
 

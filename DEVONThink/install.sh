@@ -8,6 +8,17 @@
 #
 # Install the scripts
 
+SCRIPTS_LIST=".DEVONthink-common DEVONthink-date DEVONthink-task DEVONthink-zettelnote"
+
+process_scripts() {
+	for script in ${SCRIPTS_LIST}; do
+		echo "Processing $script"
+		compile_script "$script.applescript"
+		make_copy "${TARGET}" "$script.scpt"
+		rm "$script.scpt"
+	done
+}
+
 makedir() {
 	# must be called with parenthesis to accomodate space and special characters
 	TARGET=${1}
@@ -15,6 +26,14 @@ makedir() {
 		mkdir -p "$TARGET"
 	fi
 }
+
+make_copy() {
+	TARGET="${1}"
+	f="$1"
+	echo "Copying $f to ${TARGET}"
+	cp "$f" "${TARGET}/"
+}
+
 
 docopy() {
 	TARGET="${1}"
@@ -25,20 +44,20 @@ docopy() {
 	done 
 }
 
-compile_scripts() {
+
+compile_script() {
 	# Compile all .applescript files to .scpt files
-	for f in *.applescript; do
-		if [[ -f "$f" ]]; then
-			BASENAME="${f%.applescript}"
-			SCPTFILE="${BASENAME}.scpt"
-			echo "Compiling $f to ${SCPTFILE}"
-			osacompile -o "${SCPTFILE}" "$f"
-			if [[ $? -ne 0 ]]; then
-				echo "ERROR: Failed to compile $f"
-				exit 1
-			fi
+	f="$1"
+	if [[ -f "$f" ]]; then
+		BASENAME="${f%.applescript}"
+		SCPTFILE="${BASENAME}.scpt"
+		echo "Compiling $f to ${SCPTFILE}"
+		osacompile -o "${SCPTFILE}" "$f"
+		if [[ $? -ne 0 ]]; then
+			echo "ERROR: Failed to compile $f"
+			exit 1
 		fi
-	done
+	fi
 }
 
 
@@ -55,13 +74,9 @@ else
 	exit 1
 fi
 
-# Compile the AppleScript source files
-compile_scripts
-# and move them to the target directory
-makedir "${TARGET}"
-docopy "${TARGET}" "*.scpt"
-# and remove the compiled files
-rm *.scpt
+# Compile the AppleScript source files and place them in the target directory
+process_scripts
+
 #
 # Next, install the templates
 if [[ -d "${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex" ]]; then
@@ -74,5 +89,6 @@ else
 	echo "No DEVONthink templates installation found"
 	exit 1
 fi
+#
 makedir "${TARGET}"
 docopy "${TARGET}" "templates/*"
