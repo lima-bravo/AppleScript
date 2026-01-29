@@ -47,6 +47,15 @@ docopy() {
 	done 
 }
 
+directory_copy() {
+	TARGET="${1}"
+	FILTER="${2}"
+	for f in $FILTER; do
+		echo "Copying $f to ${TARGET}"
+		cp -r "$f" "${TARGET}/"
+	done 
+}
+
 
 compile_script() {
 	# Compile all .applescript files to .scpt files
@@ -86,12 +95,12 @@ process_scripts
 #
 # Next, install the templates
 # 
-if [[ -d "${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex" ]]; then
-	# DEVONthink 3
-	TARGET="${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex/@LB.dtTemplate/English.lproj"
-elif [[ -d "${HOME}/Library/Application Support/DEVONthink/Templates.noindex" ]]; then
+if [[ -d "${HOME}/Library/Application Support/DEVONthink/Templates.noindex" ]]; then
 	# DEVONthink 4
 	TARGET="${HOME}/Library/Application Support/DEVONthink/Templates.noindex/@LB.dtTemplate/English.lproj"
+elif [[ -d "${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex" ]]; then
+	# DEVONthink 3
+	TARGET="${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex/@LB.dtTemplate/English.lproj"
 else
 	echo "No DEVONthink templates installation found"
 	exit 1
@@ -99,3 +108,17 @@ fi
 #
 makedir "${TARGET}"
 docopy "${TARGET}" "templates/*"
+
+# Next, install the File templates
+if [[ -d "${HOME}/Library/Application Support/DEVONthink/Templates.noindex" ]]; then
+	# DEVONthink 4
+	TARGET="${HOME}/Library/Application Support/DEVONthink/Templates.noindex/Common Templates"
+elif [[ -d "${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex" ]]; then
+	# DEVONthink 3
+	TARGET="${HOME}/Library/Application Support/DEVONthink 3/Templates.noindex/Common Templates"
+else
+	echo "No DEVONthink file templates installation found "
+	exit 1
+fi
+makedir "${TARGET}"
+directory_copy "${TARGET}" "Common/*"
