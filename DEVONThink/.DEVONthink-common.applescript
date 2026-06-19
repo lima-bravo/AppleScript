@@ -13,12 +13,18 @@
 
 on get_template_base(app_support)
 	set lb_path to "Templates.noindex:@LB.dtTemplate:English.lproj:"
-	-- set dt3_path to (app_support & "DEVONthink 3:" & lb_path) as string
+	set dt4_path to (app_support & "DEVONthink:" & lb_path) as string
 	try
-		-- alias dt3_path
-		return "DEVONthink 3:" & lb_path
-	on error
+		alias dt4_path
 		return "DEVONthink:" & lb_path
+	on error
+		set dt3_path to (app_support & "DEVONthink 3:" & lb_path) as string
+		try
+			alias dt3_path
+			return "DEVONthink 3:" & lb_path
+		on error
+			error "No DEVONthink templates installation found"
+		end try
 	end try
 end get_template_base
 
