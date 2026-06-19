@@ -1,78 +1,107 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # install the script files in the DEVONthink scripts directory
 #
-# this must be run from this directory
+# Run from any directory: ./install.sh
+# Do not source this script (. ./install.sh); it must run under bash.
 #
 # Using @LB as a way of getting it at the top of the Scripts hierarchy - otherwise use @$USER or something
 #
-# Install the scripts
 
-SCRIPTS_LIST=".DEVONthink-common DEVONthink-date DEVONthink-task DEVONthink-zettelnote"
+if [[ -z "${BASH_VERSION:-}" ]]; then
+	exec bash "$0" "$@"
+fi
+
+if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+	echo "ERROR: Do not source this script. Run: ./install.sh" >&2
+	return 1 2>/dev/null || exit 1
+fi
+
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+SCRIPTS=(
+	".DEVONthink-common"
+	"DEVONthink-date"
+	"DEVONthink-task"
+	"DEVONthink-zettelnote"
+)
 
 process_scripts() {
-	for script in ${SCRIPTS_LIST}; do
+	local script
+	for script in "${SCRIPTS[@]}"; do
 		echo "Processing $script"
-		compile_script "$script.applescript"
-		make_copy "${TARGET}" "$script.scpt"
-		rm "$script.scpt"
+		compile_script "${script}.applescript"
+		make_copy "${TARGET}" "${script}.scpt"
+		rm "${script}.scpt"
 	done
 }
 
 makedir() {
 	# must be called with parenthesis to accomodate space and special characters
-	TARGET=${1}
+	local target="${1}"
 	# check if the target directory exists, and empty it
-	if [[ -d "${TARGET}" ]]; then
-		rm -rf "${TARGET}"
+	if [[ -d "${target}" ]]; then
+		rm -rf "${target}"
 	fi
 	# create the target directory
-	mkdir -p "$TARGET"
+	mkdir -p "${target}"
 }
 
 make_copy() {
-	TARGET="${1}"
-	f="$2"
-	echo "Copying $f to ${TARGET}"
-	cp "$f" "${TARGET}/"
+	local target="${1}"
+	local f="${2}"
+	echo "Copying ${f} to ${target}"
+	cp "${f}" "${target}/"
 }
 
-
 docopy() {
-	TARGET="${1}"
-	FILTER="${2}"
-	for f in $FILTER; do
-		echo "Copying $f to ${TARGET}"
-		cp "$f" "${TARGET}/"
-	done 
+	local target="${1}"
+	local pattern="${2}"
+	local f
+	shopt -s nullglob
+	local files=(${pattern})
+	shopt -u nullglob
+	if [[ ${#files[@]} -eq 0 ]]; then
+		echo "ERROR: No files match ${pattern}" >&2
+		exit 1
+	fi
+	for f in "${files[@]}"; do
+		echo "Copying ${f} to ${target}"
+		cp "${f}" "${target}/"
+	done
 }
 
 directory_copy() {
-	TARGET="${1}"
-	FILTER="${2}"
-	for f in $FILTER; do
-		echo "Copying $f to ${TARGET}"
-		cp -r "$f" "${TARGET}/"
-	done 
+	local target="${1}"
+	local pattern="${2}"
+	local f
+	shopt -s nullglob
+	local files=(${pattern})
+	shopt -u nullglob
+	if [[ ${#files[@]} -eq 0 ]]; then
+		echo "ERROR: No files match ${pattern}" >&2
+		exit 1
+	fi
+	for f in "${files[@]}"; do
+		echo "Copying ${f} to ${target}"
+		cp -r "${f}" "${target}/"
+	done
 }
-
 
 compile_script() {
 	# Compile all .applescript files to .scpt files
-	f="$1"
-	if [[ -f "$f" ]]; then
-		BASENAME="${f%.applescript}"
-		SCPTFILE="${BASENAME}.scpt"
-		echo "Compiling $f to ${SCPTFILE}"
-		osacompile -o "${SCPTFILE}" "$f"
-		if [[ $? -ne 0 ]]; then
-			echo "ERROR: Failed to compile $f"
-			exit 1
-		fi
+	local f="${1}"
+	if [[ ! -f "${f}" ]]; then
+		echo "ERROR: Source file not found: ${f}" >&2
+		exit 1
 	fi
+	local basename="${f%.applescript}"
+	local scptfile="${basename}.scpt"
+	echo "Compiling ${f} to ${scptfile}"
+	osacompile -o "${scptfile}" "${f}"
 }
-
-
 
 # Install the scripts
 if [[ -d "${HOME}/Library/Application Scripts/com.devon-technologies.think3/Menu" ]]; then
@@ -94,7 +123,7 @@ process_scripts
 
 #
 # Next, install the templates
-# 
+#
 if [[ -d "${HOME}/Library/Application Support/DEVONthink/Templates.noindex" ]]; then
 	# DEVONthink 4
 	TARGET="${HOME}/Library/Application Support/DEVONthink/Templates.noindex/@LB.dtTemplate/English.lproj"
@@ -122,3 +151,5 @@ else
 fi
 makedir "${TARGET}"
 directory_copy "${TARGET}" "Common/*"
+
+echo "Install complete."
